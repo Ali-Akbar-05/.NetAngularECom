@@ -1,13 +1,8 @@
-
-
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core.Entities;
+using Core.Interfaces;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
@@ -15,25 +10,25 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
-        private readonly ILogger<ProductController> _logger;
-        private readonly StoreContext _dbCon;
+        private readonly ILogger<ProductController> _logger; 
+        private readonly IProductRepository _productRepository;
 
-        public ProductController(ILogger<ProductController> logger, StoreContext dbCon)
+        public ProductController(ILogger<ProductController> logger, IProductRepository productRepository)
         {
-            _dbCon = dbCon;
+            _productRepository = productRepository; 
             _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetProducts()
         {
-            var products = await _dbCon.Products.ToListAsync();
+            var products = await _productRepository.GetProductsAsync();
             return Ok(products);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product =await _dbCon.Products.Where(b => b.Id == id).FirstOrDefaultAsync();
+            var product =await _productRepository.GetProductByIdAsync(id);
             if (product is null)
             {
                 return BadRequest();
