@@ -10,12 +10,12 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
-        private readonly ILogger<ProductController> _logger; 
+        private readonly ILogger<ProductController> _logger;
         private readonly IProductRepository _productRepository;
 
         public ProductController(ILogger<ProductController> logger, IProductRepository productRepository)
         {
-            _productRepository = productRepository; 
+            _productRepository = productRepository;
             _logger = logger;
         }
 
@@ -28,12 +28,22 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product =await _productRepository.GetProductByIdAsync(id);
+            var product = await _productRepository.GetProductByIdAsync(id);
             if (product is null)
             {
                 return BadRequest();
             }
             return Ok(product);
+        }
+        [HttpGet("brands")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
+        {
+            return Ok(await _productRepository.GetProductBrandsAsync());
+        }
+        [HttpGet("types")]
+        public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductTypes()
+        {
+            return Ok(await _productRepository.GetProductTypesAsync());
         }
     }
 }
