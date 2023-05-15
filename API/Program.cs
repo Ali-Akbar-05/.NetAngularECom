@@ -1,5 +1,7 @@
 
 
+using System.Reflection;
+using API.Heloper;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.Repository;
@@ -15,7 +17,9 @@ builder.Services.AddDbContext<StoreContext>(options => options.UseSqlite(configu
 builder.Services.AddScoped<StoreContextInitialiser>();
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -53,6 +57,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 
