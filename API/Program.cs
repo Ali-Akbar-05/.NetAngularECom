@@ -1,10 +1,7 @@
-
-
 using System.Reflection;
-using API.Heloper;
-using Core.Interfaces;
+using API.Extensions;
+using API.Middleware;
 using Infrastructure.Data;
-using Infrastructure.Data.Repository;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -16,27 +13,22 @@ var configuration = builder.Configuration.GetConnectionString("DefaultConnection
 builder.Services.AddDbContext<StoreContext>(options => options.UseSqlite(configuration));
 builder.Services.AddScoped<StoreContextInitialiser>();
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Api", Version = "v1" });
-});
+builder.Services.AddApplicationServices();
+builder.Services.AddSwaggerService();
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1"));
+    app.UseSwaggerService();
 
     using (var scope = app.Services.CreateScope())
     {
@@ -46,13 +38,13 @@ if (app.Environment.IsDevelopment())
             await initialiser.InitialiseAsync();
             await initialiser.TrySeedAsync();
         }
-        catch(Exception e){
+        catch (Exception e)
+        {
             var errorMsg = e.Message;
         }
     }
-
-
 }
+app.UseStatusCodePagesWithReExecute("/errors/{0}");
 
 app.UseHttpsRedirection();
 
