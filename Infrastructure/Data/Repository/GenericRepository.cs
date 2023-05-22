@@ -36,12 +36,22 @@ namespace Infrastructure.Data.Repository
         }
         public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec)
         {
-             return await ApplySpecification(spec).ToListAsync();
+            return await ApplySpecification(spec).ToListAsync();
         }
+        public async Task<int> CountAsync(ISpecification<T> spec)
+        {
+            return await ApplySpecification(spec).CountAsync();
+        }
+
+
+
+
 
         private IQueryable<T> ApplySpecification(ISpecification<T> spec)
         {
-            return SpecificationEvaluator<T>.GetQuery(_dbCon.Set<T>().AsQueryable(),spec);
+            return SpecificationEvaluator<T>.GetQuery(_dbCon.Set<T>().AsQueryable(), spec);
         }
+
+
     }
 }

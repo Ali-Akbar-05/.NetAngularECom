@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace API.Controllers
 {
-
+    [ApiExplorerSettings(IgnoreApi =true)]
     public class BuggyController : BaseApiController
     {
         private readonly ILogger<BuggyController> _logger;
